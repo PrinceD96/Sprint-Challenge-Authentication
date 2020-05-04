@@ -4,13 +4,16 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Lock from "@material-ui/icons/Lock";
 import axios from "axios";
+import FadeLoader from "react-spinners/FadeLoader";
+import { css } from "@emotion/core";
 
-const Register = () => {
+const Login = props => {
 	const [credentials, setCredentials] = useState({
 		username: "",
 		password: ""
 	});
 	const [error, setError] = useState({
+		credentials: "",
 		username: false,
 		password: false
 	});
@@ -18,11 +21,22 @@ const Register = () => {
 		username: "",
 		password: ""
 	});
-
 	const [disable, setDisable] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const override = css`
+		display: block;
+		margin: 0 auto;
+		border-color: red;
+	`;
 
 	const handleChange = e => {
 		setCredentials({ ...credentials, [e.target.name]: e.target.value });
+		setError({
+			credentials: "",
+			username: false,
+			password: false
+		});
 
 		const char = e.target.value.length;
 
@@ -61,24 +75,35 @@ const Register = () => {
 		}
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = async e => {
 		try {
-			await axios.post("http://localhost:5000/api/auth/register", credentials);
-			console.log("Submitted");
+			e.preventDefault();
+			setIsLoading(true);
+			let res = await axios.post(
+				"http://localhost:5000/api/auth/login",
+				credentials
+			);
 			setCredentials({ username: "", password: "" });
+			localStorage.setItem("token", res.data.token);
+			props.history.push("/jokes");
 		} catch (e) {
-			console.log(e);
+			setError({
+				credentials: e.response.data.message,
+				username: true,
+				password: true
+			});
+			setCredentials({ username: "", password: "" });
 		}
 	};
 
 	return (
 		<div className='signUp__form__container'>
-			<h3 className='signUp__form__title'>Register Below!</h3>
+			<h3 className='signUp__form__title'>Welcome back!</h3>
+			{error.credentials && <p style={{ color: "red" }}>{error.credentials}</p>}
 			<form onSubmit={handleSubmit}>
 				<TextField
 					name='username'
 					label='Username'
-					// required
 					error={error.username}
 					autoFocus
 					helperText={helperText.username}
@@ -92,7 +117,6 @@ const Register = () => {
 					name='password'
 					label='Password'
 					type='password'
-					// required
 					error={error.password}
 					helperText={helperText.password}
 					value={credentials.password}
@@ -102,24 +126,34 @@ const Register = () => {
 				<br />
 				<br />
 				<br />
-
-				<Button
-					size='large'
-					variant='contained'
-					endIcon={<Lock />}
-					color='primary'
-					disabled={disable}
-					fullWidth
-					type='submit'
-				>
-					Sign Up
-				</Button>
-				<p>
-					Already have an account? <Link to='/'>Login</Link>
-				</p>
+				{isLoading ? (
+					<FadeLoader
+						css={override}
+						size={150}
+						color={"#123abc"}
+						loading={isLoading}
+					/>
+				) : (
+					<>
+						<Button
+							size='large'
+							variant='contained'
+							endIcon={<Lock />}
+							color='primary'
+							disabled={disable}
+							fullWidth
+							type='submit'
+						>
+							Login
+						</Button>
+						<p>
+							Don't have an account yet? <Link to='/register'>Register</Link>
+						</p>
+					</>
+				)}
 			</form>
 		</div>
 	);
 };
 
-export default Register;
+export default Login;

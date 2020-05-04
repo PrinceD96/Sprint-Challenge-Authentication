@@ -26,7 +26,9 @@ const validatePassword = (req, res, next) => {
 				req.user = user;
 				next();
 			} else {
-				res.status(401).json({ message: "Invalid credentials" });
+				res
+					.status(401)
+					.json({ message: "Invalid credentials. Please try again!" });
 			}
 		})
 		.catch(error =>
