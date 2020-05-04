@@ -1,11 +1,9 @@
-const router = require('express').Router();
+const router = require("express-promise-router")();
 
-router.post('/register', (req, res) => {
-  // implement registration
-});
+const registerRouter = require("./register/register-router");
+const loginRouter = require("./login/login-router");
 
-router.post('/login', (req, res) => {
-  // implement login
-});
-
-module.exports = router;
+module.exports = [
+	router.use("/register", registerRouter),
+	router.use("/login", loginRouter)
+];
