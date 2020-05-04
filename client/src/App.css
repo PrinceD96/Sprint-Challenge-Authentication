@@ -1,6 +1,7 @@
 .App {
 	text-align: center;
 	box-sizing: border-box;
+	margin: 0 auto;
 }
 
 .signUp__form__container {
@@ -20,4 +21,28 @@
 
 .signUp__form__title {
 	margin: 10px auto;
+}
+
+.jokes__container {
+	padding: 0 20px;
+}
+
+@media only screen and (max-width: 600px) {
+	.App {
+		width: 400px;
+	}
+
+	.jokes__container {
+		text-align: left;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	.App {
+		width: 350px;
+	}
+
+	.signUp__form__container {
+		width: 300px;
+	}
 }
