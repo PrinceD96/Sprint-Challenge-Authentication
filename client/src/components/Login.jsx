@@ -4,6 +4,8 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Lock from "@material-ui/icons/Lock";
 import axios from "axios";
+import FadeLoader from "react-spinners/FadeLoader";
+import { css } from "@emotion/core";
 
 const Login = props => {
 	const [credentials, setCredentials] = useState({
@@ -20,6 +22,13 @@ const Login = props => {
 		password: ""
 	});
 	const [disable, setDisable] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const override = css`
+		display: block;
+		margin: 0 auto;
+		border-color: red;
+	`;
 
 	const handleChange = e => {
 		setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -69,6 +78,7 @@ const Login = props => {
 	const handleSubmit = async e => {
 		try {
 			e.preventDefault();
+			setIsLoading(true);
 			let res = await axios.post(
 				"http://localhost:5000/api/auth/login",
 				credentials
@@ -89,9 +99,7 @@ const Login = props => {
 	return (
 		<div className='signUp__form__container'>
 			<h3 className='signUp__form__title'>Welcome back!</h3>
-
 			{error.credentials && <p style={{ color: "red" }}>{error.credentials}</p>}
-
 			<form onSubmit={handleSubmit}>
 				<TextField
 					name='username'
@@ -118,21 +126,31 @@ const Login = props => {
 				<br />
 				<br />
 				<br />
-
-				<Button
-					size='large'
-					variant='contained'
-					endIcon={<Lock />}
-					color='primary'
-					disabled={disable}
-					fullWidth
-					type='submit'
-				>
-					Login
-				</Button>
-				<p>
-					Don't have an account yet? <Link to='/register'>Register</Link>
-				</p>
+				{isLoading ? (
+					<FadeLoader
+						css={override}
+						size={150}
+						color={"#123abc"}
+						loading={isLoading}
+					/>
+				) : (
+					<>
+						<Button
+							size='large'
+							variant='contained'
+							endIcon={<Lock />}
+							color='primary'
+							disabled={disable}
+							fullWidth
+							type='submit'
+						>
+							Login
+						</Button>
+						<p>
+							Don't have an account yet? <Link to='/register'>Register</Link>
+						</p>
+					</>
+				)}
 			</form>
 		</div>
 	);
